@@ -2,7 +2,7 @@ const coreDir = 'C:/Users/pujan/AppData/Local/npm-cache/_npx/9833c18b2d85bc59/no
 const { chromium } = require(coreDir);
 const { resolve, basename } = require('node:path');
 
-const FILE = resolve('output/precedent-demo.mp4');
+const FILE = resolve(process.argv[2] || 'output/precedent-demo.mp4');
 
 (async () => {
   const browser = await chromium.connectOverCDP('http://127.0.0.1:9223');

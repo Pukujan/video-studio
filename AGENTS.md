@@ -158,8 +158,8 @@ blocks `node.exe` inbound and the user may not approve a UAC prompt. Upload to
 Google Drive instead (session is already signed in):
 
 ```powershell
-node scripts\upload-drive.js     # uploads output/precedent-demo.mp4 via Drive UI
-node scripts\drive-link.js       # prints the file id → shareable link
+node scripts\upload-drive.js output\precedent-demo.mp4   # path arg; defaults to that file
+node scripts\drive-link.js precedent-demo                  # name fragment; prints file id + link
 ```
 
 How upload works (for writing new variants): Drive has **no `input[type=file]`
