@@ -1,0 +1,17 @@
+{
+  "name": "video-studio",
+  "version": "1.0.0",
+  "description": "Agent-driven video studio: durable signed-in Chrome automation (capture, Drive upload) + Kokoro/ffmpeg narration pipeline + deterministic HTML motion graphics.",
+  "scripts": {
+    "browser": "powershell -ExecutionPolicy Bypass -File scripts/chrome-cdp.ps1",
+    "demo": "node scripts/make-voiceover.mjs script/narration.json output/vo 1.12 && node scripts/assemble-video.mjs script/narration.json output/vo"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "kokoro-js": "^1.2.1",
+    "playwright-core": "^1.64.1"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "output": "output/precedent-demo.mp4",
+  "voice": "af_heart",
+  "speed": 1.12,
+  "hold_seconds": 0.4,
+  "zoom": 0.06,
+  "scenes": [
+    {
+      "id": "s1",
+      "capture": "slide01.png",
+      "crop": [560, 300, 1840, 1020],
+      "line": "Every legal answer starts with research. Every research answer has to be checked. Precedent writes the memo, and shows you why it's right."
+    },
+    {
+      "id": "s2",
+      "capture": "slide02.png",
+      "crop": [560, 300, 1840, 1020],
+      "line": "Multi-agent systems fail four ways. Agents collide. Output goes unverified. Side effects escape. And nothing leaves a trace. Precedent answers all four."
+    },
+    {
+      "id": "s3",
+      "capture": "02-answer.png",
+      "crop": null,
+      "line": "Ask in plain language. You get a short answer, the authorities behind it, and a caveat when the sources don't support one."
+    },
+    {
+      "id": "s4",
+      "capture": "03-map.png",
+      "crop": null,
+      "line": "Every citation resolves to a real jurisdiction, pinned on the map, so you can see whether a claim rests on one line of cases, or on many."
+    },
+    {
+      "id": "s5",
+      "capture": "slide07.png",
+      "crop": [560, 300, 1840, 1020],
+      "line": "The safeguard rejects any authority that was never retrieved. Quotes are copied verbatim. Nothing is beyond inspection."
+    },
+    {
+      "id": "s6",
+      "capture": "slide05.png",
+      "crop": [560, 300, 1840, 1020],
+      "line": "Four agents run every question. Planner, retriever, writer, safeguard. Every step traced, timed, and scored in Arize Phoenix."
+    },
+    {
+      "id": "s7",
+      "capture": "slide08.png",
+      "crop": [560, 300, 1840, 1020],
+      "line": "Seven partners, one pipeline. Daytona, SurrealDB, Octo, Arize, ElevenLabs, Anthropic, and ACS."
+    },
+    {
+      "id": "s8",
+      "capture": "slide09.png",
+      "crop": [560, 300, 1840, 1020],
+      "line": "Precedent. Verified research memos for legal teams. Ask your own question."
+    }
+  ]
+}

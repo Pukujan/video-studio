@@ -1,0 +1,49 @@
+{
+  "output": "output/prd-agent-hype.mp4",
+  "voice": "am_michael",
+  "speed": 1.16,
+  "hold_seconds": 0,
+  "zoom": 0.06,
+  "scenes": [
+    {
+      "id": "s1",
+      "capture": "x",
+      "line": "AI can write a novel. It can research a trend. So why does everything it ships sound like an audit trail?"
+    },
+    {
+      "id": "s2",
+      "capture": "x",
+      "line": "Installation. Configuration. Known limitations. That is not a story. That is a compliance checklist with a README."
+    },
+    {
+      "id": "s3",
+      "capture": "x",
+      "line": "Here is what nobody tells you. Nobody cares what your agents do. They care what happens to them."
+    },
+    {
+      "id": "s4",
+      "capture": "x",
+      "line": "So PRD agent hands you the dial. From clinical truth, all the way to electric god mode."
+    },
+    {
+      "id": "s5",
+      "capture": "x",
+      "line": "It knows who is holding the wallet. The solopreneur. The enterprise. The normie. Different nightmares. Different dreams."
+    },
+    {
+      "id": "s6",
+      "capture": "x",
+      "line": "Point it at any artifact. It extracts the claims, researches the trend, finds the position, and writes the story."
+    },
+    {
+      "id": "s7",
+      "capture": "x",
+      "line": "Then it ships the whole launch. Landing copy. The thread. Show H N. And a ten slide pitch deck."
+    },
+    {
+      "id": "s8",
+      "capture": "x",
+      "line": "One command. Any repo. Story first. Feature later. This is PRD agent."
+    }
+  ]
+}

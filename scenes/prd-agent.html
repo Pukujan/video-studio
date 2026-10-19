@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PRD-agent — motion</title>
+<style>
+  :root{
+    --bg:#05070a; --ink:#f2f6fa; --dim:#697585;
+    --acid:#c8ff2e; --hot:#ff2d55; --blue:#5b8cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  body{
+    font-family:"Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  #stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  #grid{
+    position:absolute;inset:0;opacity:.30;
+    background-image:
+      linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);
+    background-size:80px 80px;
+  }
+  #vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(120% 90% at 50% 45%,transparent 35%,rgba(0,0,0,.75) 100%);
+  }
+  .scene{position:absolute;inset:0;opacity:0}
+  .label{
+    position:absolute;left:110px;top:88px;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:19px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;
+  }
+  .label b{color:var(--acid);font-weight:600}
+
+  /* ---------- S1 ---------- */
+  #s1 .l1,#s1 .l2{
+    position:absolute;left:110px;font-weight:800;letter-spacing:-.045em;
+    line-height:.92;font-size:148px;
+  }
+  #s1 .l1{top:268px}
+  #s1 .l2{top:408px}
+  #s1 .hot{color:var(--hot)}
+  #s1 .stamp{
+    position:absolute;right:120px;bottom:132px;
+    border:5px solid var(--acid);color:var(--acid);
+    padding:16px 34px;font-weight:800;font-size:40px;letter-spacing:.06em;
+    transform-origin:center;
+  }
+
+  /* ---------- S2 ---------- */
+  #s2 .term{
+    position:absolute;left:110px;top:300px;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:46px;line-height:1.62;color:var(--dim);
+  }
+  #s2 .term span{display:block}
+  #s2 .term .hash{color:var(--blue)}
+  #s2 .slam{
+    position:absolute;left:110px;top:300px;font-weight:800;
+    font-size:96px;line-height:1.08;letter-spacing:-.035em;
+  }
+  #s2 .slam em{font-style:normal;color:var(--hot)}
+
+  /* ---------- S3 ---------- */
+  #s3 .big{position:absolute;left:110px;top:300px;font-weight:800;
+    font-size:132px;line-height:1.02;letter-spacing:-.04em}
+  #s3 .big .acid{color:var(--acid)}
+
+  /* ---------- S4 dial ---------- */
+  #s4 .num{
+    position:absolute;left:104px;top:210px;font-weight:800;
+    font-size:320px;line-height:1;letter-spacing:-.06em;
+    font-variant-numeric:tabular-nums;
+  }
+  #s4 .barwrap{position:absolute;left:110px;top:640px;width:1700px}
+  #s4 .track{height:10px;background:rgba(255,255,255,.10);position:relative}
+  #s4 .fill{position:absolute;left:0;top:0;height:10px;background:linear-gradient(90deg,var(--blue),var(--acid),var(--hot))}
+  #s4 .ticks{position:relative;margin-top:26px;height:90px}
+  #s4 .tick{position:absolute;transform:translateX(-50%);text-align:center;width:260px}
+  #s4 .tick .n{font-family:"Cascadia Mono",Consolas,monospace;font-size:20px;color:var(--dim);letter-spacing:.1em}
+  #s4 .tick .d{font-size:21px;color:var(--dim);margin-top:6px}
+
+  /* ---------- S5 personas ---------- */
+  #s5 .cards{position:absolute;left:110px;top:330px;display:flex;gap:44px}
+  #s5 .card{
+    width:520px;height:400px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.025);padding:44px 40px;position:relative;
+  }
+  #s5 .card .k{font-family:"Cascadia Mono",Consolas,monospace;font-size:18px;color:var(--acid);letter-spacing:.18em}
+  #s5 .card h3{font-size:54px;font-weight:800;letter-spacing:-.03em;margin-top:22px;line-height:1}
+  #s5 .card p{font-size:25px;color:#a9b4c2;line-height:1.45;margin-top:24px}
+
+  /* ---------- S6 pipeline ---------- */
+  #s6 .pipe{position:absolute;left:110px;top:470px;display:flex;align-items:center}
+  #s6 .node{
+    width:250px;height:126px;border:1px solid rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:700;letter-spacing:-.01em;
+    background:rgba(255,255,255,.02);
+  }
+  #s6 .node.on{border-color:var(--acid);color:var(--acid);background:rgba(200,255,46,.07)}
+  #s6 .conn{width:52px;height:2px;background:rgba(255,255,255,.16);position:relative}
+  #s6 .conn .lit{position:absolute;left:0;top:0;height:2px;width:0;background:var(--acid)}
+
+  /* ---------- S7 pack ---------- */
+  #s7 .pack{position:absolute;left:110px;top:320px;display:grid;
+    grid-template-columns:830px 830px;gap:34px}
+  #s7 .asset{
+    height:170px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.025);padding:34px 38px;
+  }
+  #s7 .asset .f{font-family:"Cascadia Mono",Consolas,monospace;font-size:34px;color:var(--acid)}
+  #s7 .asset .d{font-size:24px;color:#9aa6b5;margin-top:14px}
+
+  /* ---------- S8 CTA ---------- */
+  #s8 .cta{position:absolute;left:110px;top:250px;font-weight:800;
+    font-size:128px;letter-spacing:-.045em;line-height:1.02}
+  #s8 .cta .acid{color:var(--acid)}
+  #s8 .term{
+    position:absolute;left:110px;top:610px;width:1400px;
+    border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);
+    font-family:"Cascadia Mono",Consolas,monospace;font-size:36px;
+    padding:34px 38px;color:#dbe4ee;
+  }
+  #s8 .term .p{color:var(--acid)}
+  #s8 .mark{
+    position:absolute;right:110px;bottom:96px;font-size:42px;font-weight:800;
+    letter-spacing:-.02em;color:rgba(255,255,255,.55);
+  }
+  #s8 .mark i{font-style:normal;color:var(--acid)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="grid"></div>
+
+  <section class="scene" id="s1">
+    <div class="label">PRD-AGENT <b>/ 01</b></div>
+    <div class="l1">AI can write</div>
+    <div class="l2">a <span class="hot">novel</span>.</div>
+    <div class="stamp">STORY FIRST. FEATURE LATER.</div>
+  </section>
+
+  <section class="scene" id="s2">
+    <div class="label">THE DEFAULT OUTPUT <b>/ 02</b></div>
+    <div class="term">
+      <span><span class="hash">##</span> Installation</span>
+      <span><span class="hash">##</span> Configuration</span>
+      <span><span class="hash">##</span> Known limitations</span>
+      <span><span class="hash">##</span> License</span>
+    </div>
+    <div class="slam">Everything AI writes<br>sounds like <em>an audit trail.</em></div>
+  </section>
+
+  <section class="scene" id="s3">
+    <div class="label">THE PART EVERYONE MISSES <b>/ 03</b></div>
+    <div class="big">Nobody cares<br>what your agents do.<br><span class="acid">They care what<br>happens to them.</span></div>
+  </section>
+
+  <section class="scene" id="s4">
+    <div class="label">THE HYPE DIAL <b>/ 04</b></div>
+    <div class="num" id="dialNum">250</div>
+    <div class="barwrap">
+      <div class="track"><div class="fill" id="dialFill"></div></div>
+      <div class="ticks">
+        <div class="tick" style="left:0%"><div class="n">250</div><div class="d">Pure truth</div></div>
+        <div class="tick" style="left:33.3%"><div class="n">500</div><div class="d">Balanced</div></div>
+        <div class="tick" style="left:66.6%"><div class="n">750</div><div class="d">Venture</div></div>
+        <div class="tick" style="left:100%"><div class="n">1000</div><div class="d">Electric</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="s5">
+    <div class="label">THREE BUYERS <b>/ 05</b></div>
+    <div class="cards">
+      <div class="card">
+        <div class="k">SOLOPRENEUR</div>
+        <h3>One-person<br>unicorn</h3>
+        <p>Ship like a team of fifty. Kill the admin drag.</p>
+      </div>
+      <div class="card">
+        <div class="k">ENTERPRISE</div>
+        <h3>Boardroom<br>leverage</h3>
+        <p>Kill security theater. Break the vendor cartel.</p>
+      </div>
+      <div class="card">
+        <div class="k">NORMIE</div>
+        <h3>Pure<br>everyday magic</h3>
+        <p>No jargon. No terminal. Just flying cars.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="s6">
+    <div class="label">ONE PIPELINE <b>/ 06</b></div>
+    <div class="pipe">
+      <div class="node" data-n="0">artifact</div>
+      <div class="conn"><div class="lit"></div></div>
+      <div class="node" data-n="1">claims</div>
+      <div class="conn"><div class="lit"></div></div>
+      <div class="node" data-n="2">trends</div>
+      <div class="conn"><div class="lit"></div></div>
+      <div class="node" data-n="3">positioning</div>
+      <div class="conn"><div class="lit"></div></div>
+      <div class="node" data-n="4">story</div>
+    </div>
+  </section>
+
+  <section class="scene" id="s7">
+    <div class="label">THE LAUNCH PACK <b>/ 07</b></div>
+    <div class="pack">
+      <div class="asset"><div class="f">copy.json</div><div class="d">Landing page deck. Hero, subhead, superpowers, CTAs.</div></div>
+      <div class="asset"><div class="f">launch_thread.md</div><div class="d">Six to eight posts. Pattern interrupt first.</div></div>
+      <div class="asset"><div class="f">show_hn.md</div><div class="d">Founder origin. Dogfooding. Invitation.</div></div>
+      <div class="asset"><div class="f">pitch_deck.md</div><div class="d">Ten slides. Category shift, wound, moat, economics.</div></div>
+    </div>
+  </section>
+
+  <section class="scene" id="s8">
+    <div class="label">POINT IT AT ANYTHING <b>/ 08</b></div>
+    <div class="cta">Point it at<br><span class="acid">any repo.</span></div>
+    <div class="term"><span class="p">$</span> <span id="typed"></span><span id="caret">_</span></div>
+    <div class="mark">PRD<i>-</i>agent</div>
+  </section>
+
+  <div id="vignette"></div>
+</div>
+
+<script>
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const easeOut = x => { x = clamp(x); return 1 - Math.pow(1 - x, 3); };
+const easeInOut = x => { x = clamp(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2; };
+const backOut = x => { x = clamp(x); const c = 1.70158; return 1 + (c+1)*Math.pow(x-1,3) + c*Math.pow(x-1,2); };
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+// Scene boundaries are derived from output/vo-prd/timings.json (narration
+// length + 0.35s gap), so picture and voice stay locked.
+const S = [
+  { el: $('#s1'), t0: 0.00,  t1: 7.40  },
+  { el: $('#s2'), t0: 7.40,  t1: 15.70 },
+  { el: $('#s3'), t0: 15.70, t1: 22.58 },
+  { el: $('#s4'), t0: 22.58, t1: 29.65 },
+  { el: $('#s5'), t0: 29.65, t1: 37.28 },
+  { el: $('#s6'), t0: 37.28, t1: 45.13 },
+  { el: $('#s7'), t0: 45.13, t1: 51.86 },
+  { el: $('#s8'), t0: 51.86, t1: 57.81 },
+];
+
+function setScene(el, on) { el.style.opacity = on ? 1 : 0; }
+
+const s1 = $('#s1'), s2 = $('#s2'), s3 = $('#s3'), s4 = $('#s4');
+const s5 = $('#s5'), s6 = $('#s6'), s7 = $('#s7'), s8 = $('#s8');
+const dialNum = $('#dialNum'), dialFill = $('#dialFill');
+const nodes = $$('#s6 .node');
+const conns = $$('#s6 .conn .lit');
+const assets = $$('#s7 .asset');
+const cards = $$('#s5 .card');
+const termLines = $$('#s2 .term span');
+const typedEl = $('#typed'), caret = $('#caret');
+
+function renderS1(t) {
+  const l1 = $('.l1'), l2 = $('.l2'), stamp = $('.stamp');
+  const a = easeOut(ramp(t, 0.15, 1.15));
+  l1.style.clipPath = `inset(${(1-a)*100}% 0 0 0)`;
+  l1.style.transform = `translateY(${(1-a)*40}px)`;
+  const b = easeOut(ramp(t, 0.55, 1.55));
+  l2.style.clipPath = `inset(${(1-b)*100}% 0 0 0)`;
+  l2.style.transform = `translateY(${(1-b)*40}px)`;
+  const c = ramp(t, 2.4, 2.75);
+  stamp.style.opacity = c;
+  stamp.style.transform = `rotate(-4deg) scale(${1.5 - 0.5*backOut(c)})`;
+  $('#s1').style.transform = `scale(${1 + 0.012*ramp(t, 0, 7.4)})`;
+}
+
+function renderS2(t) {
+  termLines.forEach((el, i) => {
+    const p = easeOut(ramp(t, 0.2 + i*0.42, 0.7 + i*0.42));
+    el.style.opacity = p;
+    el.style.transform = `translateX(${(1-p)*-26}px)`;
+  });
+  const slam = $('.slam');
+  const q = easeOut(ramp(t, 3.4, 4.1));
+  slam.style.opacity = q;
+  slam.style.clipPath = `inset(${(1-q)*100}% 0 0 0)`;
+  const term = $('.term');
+  // Clear the terminal completely before the slam lands.
+  term.style.opacity = 1 - clamp(ramp(t, 2.9, 3.35));
+}
+
+function renderS3(t) {
+  const big = $('#s3 .big');
+  const p = easeOut(ramp(t, 0.2, 1.3));
+  big.style.opacity = p;
+  big.style.transform = `translateY(${(1-p)*46}px)`;
+  big.style.filter = `blur(${(1-p)*8}px)`;
+}
+
+function renderS4(t) {
+  const v = 250 + 750 * easeInOut(ramp(t, 0.4, 4.6));
+  dialNum.textContent = Math.round(v / 10) * 10;
+  dialFill.style.width = `${(v - 250) / 750 * 100}%`;
+  dialNum.style.color = v > 900 ? 'var(--acid)' : 'var(--ink)';
+}
+
+function renderS5(t) {
+  cards.forEach((c, i) => {
+    const p = backOut(ramp(t, 0.2 + i*0.32, 0.95 + i*0.32));
+    c.style.opacity = clamp(p);
+    c.style.transform = `translateY(${(1-p)*70}px)`;
+  });
+}
+
+function renderS6(t) {
+  nodes.forEach((n, i) => {
+    const on = t > 0.45 + i*0.62;
+    n.classList.toggle('on', on);
+    const p = easeOut(ramp(t, 0.2 + i*0.62, 0.75 + i*0.62));
+    n.style.opacity = p;
+    n.style.transform = `scale(${0.94 + 0.06*p})`;
+  });
+  conns.forEach((c, i) => {
+    c.style.width = `${easeInOut(ramp(t, 0.62 + i*0.62, 1.05 + i*0.62)) * 100}%`;
+  });
+}
+
+function renderS7(t) {
+  assets.forEach((a, i) => {
+    const p = backOut(ramp(t, 0.2 + i*0.26, 0.9 + i*0.26));
+    a.style.opacity = clamp(p);
+    a.style.transform = `translateY(${(1-p)*54}px) scale(${0.96 + 0.04*p})`;
+  });
+}
+
+const CMD = 'python -m prd_agent owner/repo';
+function renderS8(t) {
+  const cta = $('#s8 .cta');
+  const p = easeOut(ramp(t, 0.1, 1.0));
+  cta.style.opacity = p;
+  cta.style.transform = `translateY(${(1-p)*40}px)`;
+  const term = $('#s8 .term');
+  const q = easeOut(ramp(t, 1.2, 1.8));
+  term.style.opacity = q;
+  term.style.transform = `translateY(${(1-q)*28}px)`;
+  const chars = Math.floor(ramp(t, 2.0, 3.8) * CMD.length);
+  typedEl.textContent = CMD.slice(0, chars);
+  caret.style.opacity = (Math.floor(t * 3) % 2 === 0) ? 1 : 0.15;
+}
+
+window.__duration = 57.81;
+window.__renderAt = (t) => {
+  S.forEach(({ el, t0, t1 }) => setScene(el, t >= t0 && t < t1));
+  if (t < 7.40) renderS1(t);
+  else if (t < 15.70) renderS2(t - 7.40);
+  else if (t < 22.58) renderS3(t - 15.70);
+  else if (t < 29.65) renderS4(t - 22.58);
+  else if (t < 37.28) renderS5(t - 29.65);
+  else if (t < 45.13) renderS6(t - 37.28);
+  else if (t < 51.86) renderS7(t - 45.13);
+  else renderS8(t - 51.86);
+};
+
+// Prime the DOM before the renderer starts capturing.
+window.__renderAt(0);
+window.__ready = true;
+</script>
+</body>
+</html>
