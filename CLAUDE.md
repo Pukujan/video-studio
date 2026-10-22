@@ -2,7 +2,8 @@
 
 Read `AGENTS.md` before running anything — it is the complete, verified runbook
 for browser automation and video production. `WAN.md` is the `wan` CLI runbook
-(install, auth, commands, quotas, gotchas).
+(install, auth, commands, quotas, gotchas). `FLOW.md` is the Google Flow / Veo
+runbook (UI selectors, models, credit cost, prompt patterns).
 
 ## Hard invariants
 

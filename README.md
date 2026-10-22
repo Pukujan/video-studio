@@ -33,13 +33,15 @@ Then read **[AGENTS.md](AGENTS.md)** — it is the complete runbook: commands,
 invariants, delivery, and the gotchas that cost real time to discover.
 
 For the `wan` CLI (text-to-video / video edit, auth, quotas, cost math) read
-**[WAN.md](WAN.md)**.
+**[WAN.md](WAN.md)**. For Google Flow / Veo (UI selectors, models, 20 credits per
+clip, prompt patterns) read **[FLOW.md](FLOW.md)**.
 
 ## Layout
 
 ```
 AGENTS.md            agent runbook (read this)
 WAN.md               wan CLI runbook: auth, text2video, videoedit, quotas
+FLOW.md              Google Flow / Veo runbook: selectors, models, credits
 README.md            this file
 script/              narration.json, prd-agent-hype.json — the edit surface
 scenes/              HTML motion scenes
