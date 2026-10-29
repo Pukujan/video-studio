@@ -84,6 +84,23 @@ node flow/ledger.mjs verdict <id> fail "paper appears at 3.3s, vanishes at 6.2s"
 Copy passing clips to the project that needs them. Tell the user the per-clip verdicts, the credits
 spent (`node flow/ledger.mjs stats`), and anything regenerated.
 
+## 5. Mirror to Octo (shared record)
+
+After a batch, copy the ledger and clips into the user's Octo workspace "Music video" so other
+machines and agents see the same pass rates and can fetch the files:
+
+```bash
+node flow/octo.mjs push                       # ledger -> table flow_gens, new clips -> files
+node flow/octo.mjs upload out/video.mp4 "note"   # any finished video
+node flow/octo.mjs stats                      # pass rates read back from Octo
+```
+
+Keys are `octo_db_music_video` and `octo_db_music_video_workspace` in `~/Documents/projects/.env`;
+never print them. The script only touches the tables `flow_gens` and `flow_files`. That workspace
+also holds the user's music-video project tables (`projects`, `prompts`, `assets`, `shots`...):
+read them if useful, but don't change them without asking. Files stay private; making a public
+link (`POST /api/files/<id>/publish`) needs the user's OK each time.
+
 ## Regression without burning credits
 
 Don't run test suites against Flow; each run costs real credits. Instead:

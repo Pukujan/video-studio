@@ -308,6 +308,7 @@ flags — Copilot and Perplexity stills, and INK/CEL versions of the cast.
 | `flow/qc.mjs` | start-frame match, jump cuts, sudden jumps, timestamped frame sheet |
 | `flow/ledger.mjs` | SQLite ledger (`flow/ledger.db`): stats / list / show / verdict / error |
 | `flow/templates.mjs` | prompt templates with the reason each exists |
+| `flow/octo.mjs` | mirrors the ledger (table `flow_gens`) and clips into the Octo workspace "Music video"; see SKILL.md §5 |
 
 **New UI facts learned while building it:**
 
