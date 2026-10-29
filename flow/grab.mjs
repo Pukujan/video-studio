@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { attach, openProject, pendingCount, failedCards, listVideoIds, download, failShot, ffmpeg, OUT } from './lib.mjs';
+import { attach, openProject, pendingCount, sessionState, failedCards, listVideoIds, download, failShot, ffmpeg, OUT } from './lib.mjs';
 import { rows, update } from './ledger.mjs';
 import { qc } from './qc.mjs';
 
@@ -17,10 +17,13 @@ const { browser, page } = await attach();
 try {
   await openProject(page);
   if (a.includes('--wait')) {
-    // Veo Fast is ~15 min, mostly queue. Poll every minute for up to an hour.
-    for (let i = 0; i < 60 && await pendingCount(page); i++) {
-      console.log(`${await pendingCount(page)} still rendering`);
+    // Veo Fast is ~15 min, mostly queue. Poll the newest session every minute for up to an hour.
+    for (let i = 0; i < 60; i++) {
+      const st = await sessionState(page);
+      if (st === 'done' || st === 'failed') { console.log('latest session:', st); break; }
+      console.log(new Date().toISOString().slice(11, 19), st);
       await page.waitForTimeout(60000);
+      await page.reload(); await page.waitForTimeout(6000);
     }
   }
   if (await pendingCount(page)) console.log('warning: some clips still rendering; grabbing the finished ones');

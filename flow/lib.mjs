@@ -144,6 +144,18 @@ export async function approve(page, { maxCredits = 20, dryRun = false } = {}) {
   throw new Error('no credit prompt from the Flow agent within 3 minutes');
 }
 
+// The newest session's chat ends in a finished clip, a Failed card, or neither (queued/rendering).
+// While queued there is no pending tile at all, so pendingCount alone can't tell "done" from "queued".
+export const sessionState = page => page.evaluate(() => {
+  const t = document.body.innerText;
+  const last = Math.max(t.lastIndexOf('Approve'), 0);
+  const tail = t.slice(last);
+  if (document.querySelector('flow-pending-tile')) return 'rendering';
+  if (/\bFailed\b/.test(tail)) return 'failed';
+  if (/scheduled|queue/i.test(tail) && !document.querySelector('flow-video-tile img, flow-video-tile video')) return 'queued';
+  return 'done';
+});
+
 export const pendingCount = page => page.evaluate(s => document.querySelectorAll(s).length, SEL.pendingTile);
 
 // Open the Videos view and return every clip's edit id, scrolling so lazy tiles mount.
