@@ -293,3 +293,44 @@ splices it in verbatim rather than re-cutting those 37 shots.
 full cut costs **zero credits**. Flow is for *new* shots: at 20 credits and 50
 credits/day, that is **2 clips per day**. Prioritise the gaps the story bible
 flags — Copilot and Perplexity stills, and INK/CEL versions of the cast.
+
+## 12. Reliability kit (Mac, 2026-10-29)
+
+`flow/` holds the maintained driver; `skills/flow-video/SKILL.md` is the procedure. Older
+`scripts/flow-*.js` stay for reference (Windows, port 9223 era).
+
+| file | what |
+|---|---|
+| `flow/lib.mjs` | every selector in `SEL`, plus attach / openProject / newSession / attachImage / submitPrompt / approve / listVideoIds / download |
+| `flow/doctor.mjs` | credit-free check that every control still exists |
+| `flow/gen.mjs` | one image-to-video generation, logged; `--yes` to approve |
+| `flow/grab.mjs` | wait, download new clips, link to ledger rows by first frame, auto-QC |
+| `flow/qc.mjs` | start-frame match, jump cuts, sudden jumps, timestamped frame sheet |
+| `flow/ledger.mjs` | SQLite ledger (`flow/ledger.db`): stats / list / show / verdict / error |
+| `flow/templates.mjs` | prompt templates with the reason each exists |
+
+**New UI facts learned while building it:**
+
+- Flow keeps hidden duplicates of many controls (`Upload media`, `Add to prompt`, `Approve`).
+  Text and role lookups must filter to visible elements (`loc()` does this).
+- Two visible `Settings` buttons: the top bar's opens grid-view options
+  (`flow-tile-view-settings`); only `flow-base-prompt-box button[aria-label="Settings"]` opens
+  `flow-settings-view`.
+- The asset picker sometimes ignores one Escape; `closeOverlays()` presses until no
+  `.cdk-overlay-pane` is visible. Without that, every later click lands on the picker.
+- The project page lazily mounts video tiles. `listVideoIds()` scrolls each into view in the
+  Videos view; downloading goes straight to `/project/<id>/edit/<editId>`.
+- Clicking a tile routes to `/edit/<editId>`; that id is the stable clip key used in the ledger.
+- A render can fail with a **Failed** card ("Audio generation failed ... You will be refunded").
+  The credits come back; regenerate.
+- Coordinate clicks broke twice in one day. The kit has none.
+
+**Quality findings (Veo 3.1 Fast, image-to-video from a previous clip's last frame):**
+
+| template | result |
+|---|---|
+| `loose-v1` (describe the action) | 1/5 clean: paper popping in/out, hair loose→ponytail, jump cuts to a different close-up, laptop screen morphing |
+| `still-relief` (locked camera, nothing appears/disappears, same hair/clothes, small motion) | 3/3 clean so far |
+
+The first frame always matched the start image (difference < 1 on 0-255), so starting from the
+previous clip's last frame is a reliable way to keep the same person across shots.
