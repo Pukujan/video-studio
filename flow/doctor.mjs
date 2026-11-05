@@ -2,7 +2,7 @@
 // kit clicks still exists. Opens menus and closes them; never submits a prompt.
 //
 //   node flow/doctor.mjs        exit 0 = all good, 1 = something moved (names it)
-import { attach, openProject, projectUrl, loc, SEL, failShot, closeOverlays } from './lib.mjs';
+import { attach, openProject, projectUrl, loc, SEL, failShot, closeOverlays, showVideos } from './lib.mjs';
 import { rows } from './ledger.mjs';
 
 const results = [];
@@ -25,7 +25,9 @@ await check('generate button', () => loc(page, SEL.generate).waitFor({ timeout: 
 await check('add ingredients -> Upload media / Add to prompt', async () => {
   await loc(page, SEL.addIngredients).click({ timeout: 10000 });
   await loc(page, SEL.uploadMedia).first().waitFor({ timeout: 10000 });
-  await loc(page, SEL.addToPrompt).last().waitFor({ timeout: 10000 });
+  // "Add to prompt" only shows once an asset is picked, so it is checked during a real run.
+  // The open picker's overlay covers its own toggle, hence force.
+  await loc(page, SEL.addIngredients).click({ timeout: 10000, force: true });
   await closeOverlays(page);
 });
 await check('settings panel', async () => {
@@ -34,9 +36,11 @@ await check('settings panel', async () => {
   await closeOverlays(page);
 });
 await check('Videos view', async () => {
-  await loc(page, SEL.videosNav).first().click({ timeout: 10000 });
+  await showVideos(page);
   await page.waitForTimeout(2000);
-  await loc(page, SEL.allMediaNav).first().click({ timeout: 10000 });
+  await loc(page, SEL.filters).first().click({ timeout: 10000 });
+  await loc(page, SEL.clearFilters).first().click({ timeout: 10000 });
+  await closeOverlays(page);
 });
 await check('download menu (on a clip from the ledger, if any)', async () => {
   const proj = projectUrl(page);

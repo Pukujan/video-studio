@@ -27,7 +27,10 @@ export const SEL = {
   stop: { role: 'button', name: 'stop' },
   approve: { text: 'Approve' },            // a div[role=radio], not a button
   costLine: /costing (\d+) credits?\?/,
-  videosNav: { text: 'Videos' },
+  // 2026-11-05: the Videos nav item moved into the Filters panel as a checkbox.
+  filters: { role: 'button', name: 'Filtering and sorting options' },
+  videosFilter: { role: 'checkbox', name: 'Videos' },
+  clearFilters: { role: 'button', name: 'Clear all filters' },
   allMediaNav: { text: 'All media' },
   pendingTile: 'flow-pending-tile',
   videoTile: 'flow-video-tile',
@@ -65,6 +68,9 @@ export async function attach() {
   const ctx = browser.contexts()[0];
   const page = ctx.pages().find(p => /flow\.google\.com\/project/.test(p.url()))
     || ctx.pages().find(p => /flow\.google\.com/.test(p.url())) || await ctx.newPage();
+  // The window stays hidden or minimized so it never steals focus; a narrow window makes Flow
+  // switch to its mobile layout, so render the page at desktop size whatever the window is.
+  await page.setViewportSize({ width: 1500, height: 950 });
   return { browser, ctx, page };
 }
 
@@ -83,6 +89,15 @@ export async function openProject(page, url = process.env.FLOW_PROJECT) {
     await loc(page, SEL.composer).first().waitFor({ state: 'visible', timeout: 30000 });
   });
   return projectUrl(page);
+}
+
+// Show only videos in the project grid (Filters panel > Type > Videos), then close the panel.
+export async function showVideos(page) {
+  await loc(page, SEL.filters).first().click();
+  const box = loc(page, SEL.videosFilter).first();
+  await box.waitFor({ timeout: 10000 });
+  if (!(await box.isChecked())) await box.check();
+  await closeOverlays(page);
 }
 
 export async function waitAgentIdle(page, ms = 300000) {
@@ -161,7 +176,7 @@ export const pendingCount = page => page.evaluate(s => document.querySelectorAll
 // Open the Videos view and return every clip's edit id, scrolling so lazy tiles mount.
 export async function listVideoIds(page) {
   const home = await openProject(page);
-  await loc(page, SEL.videosNav).first().click();
+  await showVideos(page);
   await page.waitForTimeout(4000);
   const pick = () => page.evaluate(() => [...document.querySelectorAll('img,video')].filter(e => {
     const r = e.getBoundingClientRect(); return r.width > 150 && r.x + r.width / 2 < innerWidth * 0.68;
@@ -169,7 +184,7 @@ export async function listVideoIds(page) {
   const n = await pick();
   const ids = [];
   for (let i = 0; i < n; i++) {
-    if (i) { await page.goto(home); await loc(page, SEL.videosNav).first().click(); await page.waitForTimeout(3000); }
+    if (i) { await page.goto(home); await showVideos(page); await page.waitForTimeout(3000); }
     const c = await page.evaluate(i => {
       const e = [...document.querySelectorAll('img,video')].filter(e => {
         const r = e.getBoundingClientRect(); return r.width > 150 && r.x + r.width / 2 < innerWidth * 0.68;
