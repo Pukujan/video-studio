@@ -4,3 +4,5 @@ output/
 .playwright-mcp/
 *.log
 __pycache__/
+flow/ledger.db
+flow/ledger.db-*

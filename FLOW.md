@@ -293,3 +293,69 @@ splices it in verbatim rather than re-cutting those 37 shots.
 full cut costs **zero credits**. Flow is for *new* shots: at 20 credits and 50
 credits/day, that is **2 clips per day**. Prioritise the gaps the story bible
 flags — Copilot and Perplexity stills, and INK/CEL versions of the cast.
+
+## 12. Reliability kit (Mac, 2026-10-29)
+
+`flow/` holds the maintained driver; `skills/flow-video/SKILL.md` is the procedure. Older
+`scripts/flow-*.js` stay for reference (Windows, port 9223 era).
+
+| file | what |
+|---|---|
+| `flow/lib.mjs` | every selector in `SEL`, plus attach / openProject / newSession / attachImage / submitPrompt / approve / listVideoIds / download |
+| `flow/doctor.mjs` | credit-free check that every control still exists |
+| `flow/gen.mjs` | one image-to-video generation, logged; `--yes` to approve |
+| `flow/grab.mjs` | wait, download new clips, link to ledger rows by first frame, auto-QC |
+| `flow/qc.mjs` | start-frame match, jump cuts, sudden jumps, timestamped frame sheet |
+| `flow/ledger.mjs` | SQLite ledger (`flow/ledger.db`): stats / list / show / verdict / error |
+| `flow/templates.mjs` | prompt templates with the reason each exists |
+| `flow/octo.mjs` | mirrors the ledger (table `flow_gens`) and clips into the Octo workspace "Music video"; see SKILL.md §5 |
+
+**Pinned account (2026-11-11).** The Claude Chromium is signed in to several Google accounts and a
+plain `flow.google.com` URL lands on the browser's default one. The kit only ever uses the account
+in `FLOW_ACCOUNT` (default `needfsw02@gmail.com`, "Chaos"). `flowBase()` in `flow/lib.mjs` finds
+that account's index by loading `/u/0/` to `/u/4/` and reading the avatar's `Google Account: ...`
+label, and every navigation goes through `gotoFlow()` under `https://flow.google.com/u/<N>`; the
+email never goes in a URL. `ensureAccount()` re-reads the label after each navigation and before
+submitting or approving, and the script exits with an error on any other account. The ledger keeps
+project URLs without `/u/<N>` (the index can change). Projects belong to one account: a project
+the pinned account does not own answers "Project not found", and the kit then uses the pinned
+account's first listed project or creates one (`FLOW_PROJECT=new` forces a fresh one).
+`flowmusic.app` has a separate sign-in that no URL can select: `flow/music/send.mjs` refuses to
+send unless that site is signed in as the pinned account, and the read-only music scripts warn.
+
+**New UI facts learned while building it:**
+
+- 2026-11-11: the composer has two modes. With the `Agent` chip on, the agent states the price and
+  waits for Approve. With it off, `Start generation` spends at once with the settings shown (for
+  example x2 outputs, 48 credits) and no prompt. `openProject()` switches Agent mode on and
+  `submitPrompt()` refuses to submit unless it is on.
+- 2026-11-11: the agent now picks Omni 1.2 Flash and asks 24 credits for 8 s, 30 for 10 s, so
+  `gen.mjs --max-credits` defaults to 30.
+- 2026-11-11: in the asset picker, clicking a row previews it and shows `Add to prompt`; clicking
+  the row that is already previewed (a fresh upload is) attaches it at once and closes the picker,
+  so the button never appears. `attachImage()` handles both and checks that a chip
+  (`flow-ingredient-chip`) landed in the composer. `doctor.mjs` exercises both on an existing image.
+
+- Flow keeps hidden duplicates of many controls (`Upload media`, `Add to prompt`, `Approve`).
+  Text and role lookups must filter to visible elements (`loc()` does this).
+- Two visible `Settings` buttons: the top bar's opens grid-view options
+  (`flow-tile-view-settings`); only `flow-base-prompt-box button[aria-label="Settings"]` opens
+  `flow-settings-view`.
+- The asset picker sometimes ignores one Escape; `closeOverlays()` presses until no
+  `.cdk-overlay-pane` is visible. Without that, every later click lands on the picker.
+- The project page lazily mounts video tiles. `listVideoIds()` scrolls each into view in the
+  Videos view; downloading goes straight to `/project/<id>/edit/<editId>`.
+- Clicking a tile routes to `/edit/<editId>`; that id is the stable clip key used in the ledger.
+- A render can fail with a **Failed** card ("Audio generation failed ... You will be refunded").
+  The credits come back; regenerate.
+- Coordinate clicks broke twice in one day. The kit has none.
+
+**Quality findings (Veo 3.1 Fast, image-to-video from a previous clip's last frame):**
+
+| template | result |
+|---|---|
+| `loose-v1` (describe the action) | 1/5 clean: paper popping in/out, hair loose→ponytail, jump cuts to a different close-up, laptop screen morphing |
+| `still-relief` (locked camera, nothing appears/disappears, same hair/clothes, small motion) | 3/3 clean so far |
+
+The first frame always matched the start image (difference < 1 on 0-255), so starting from the
+previous clip's last frame is a reliable way to keep the same person across shots.
