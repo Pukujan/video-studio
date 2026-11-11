@@ -4,10 +4,13 @@
 //   node flow/gen.mjs --image start.jpg --prompt "full prompt text" --label mom --yes
 //
 // Without --yes it stops at Flow's "costing N credits?" prompt and does not approve.
-// --max-credits N (default 20) refuses to approve anything pricier.
+// --max-credits N (default 30: Flow asks 24 to 30 for one Omni 1.2 Flash clip since 2026-11-11)
+// refuses to approve anything pricier.
+// Runs only on the pinned account (FLOW_ACCOUNT, default in lib.mjs): on any other account it
+// exits with an error before submitting or approving. FLOW_PROJECT=<url|new> picks the project.
 import fs from 'node:fs';
 import path from 'node:path';
-import { attach, openProject, newSession, attachImage, submitPrompt, approve, failShot } from './lib.mjs';
+import { attach, openProject, ensureAccount, newSession, attachImage, submitPrompt, approve, failShot } from './lib.mjs';
 import { add, update } from './ledger.mjs';
 import { render } from './templates.mjs';
 
@@ -15,7 +18,7 @@ const a = process.argv.slice(2);
 const opt = k => { const i = a.indexOf(`--${k}`); return i >= 0 ? a[i + 1] : undefined; };
 const image = opt('image'), label = opt('label'), template = opt('template');
 const yes = a.includes('--yes');
-const maxCredits = +(opt('max-credits') || 20);
+const maxCredits = +(opt('max-credits') || 30);
 let prompt = opt('prompt');
 if (template) prompt = render(template, JSON.parse(opt('vars') || '{}'));
 if (!prompt) { console.log('need --prompt or --template'); process.exit(2); }
@@ -25,6 +28,7 @@ const { browser, page } = await attach();
 let id;
 try {
   const project = await openProject(page);
+  console.error('account:', await ensureAccount(page), '| project:', project);
   await newSession(page);
   if (image) await attachImage(page, path.resolve(image));
   await submitPrompt(page, prompt);

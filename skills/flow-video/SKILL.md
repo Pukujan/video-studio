@@ -13,11 +13,19 @@ from there. Deep reference for Flow's UI: `FLOW.md`. This file is the procedure.
 1. Browser: `~/bin/claude-chrome https://flow.google.com/` (idempotent, port 9222, permanent
    profile). If Flow shows a Google sign-in, ask the user to sign in in that window. Never type
    their password.
-2. Health check (no credits): `node flow/doctor.mjs`. Every line must be ✓. A ✗ names the control
+   **Account:** the kit only uses the Google account in `FLOW_ACCOUNT` (default
+   `needfsw02@gmail.com`, "Chaos"), never the browser's default one. The scripts find that
+   account's `/u/<N>/` index themselves, open every Flow page under it, and exit with an error
+   (nothing generated or approved) if a page is on another account. Don't open `flow.google.com`
+   URLs by hand in scripts; use `gotoFlow()` from `flow/lib.mjs`. Projects belong to one account,
+   so a project URL from the other account is replaced by one of the pinned account's own.
+2. Health check (no credits): `node flow/doctor.mjs`. It prints the account it is on and fails if
+   that is not the pinned one. Every line must be ✓. A ✗ names the control
    that moved and saves a screenshot under `output/flow/failures/`. Fix the selector in `SEL` in
    `flow/lib.mjs` (one place) and re-run before spending anything.
-3. Spending: every generation costs credits (Veo 3.1 Fast: 20 per 8 s clip; PRO plan gets about 50
-   a day). Get the user's OK for the batch and its total before running `gen.mjs --yes`.
+3. Spending: every generation costs credits (2026-11-11: Flow asks 24 for 8 s and 30 for 10 s with
+   Omni 1.2 Flash; `gen.mjs` refuses anything above `--max-credits`, default 30). Get the user's OK
+   for the batch and its total before running `gen.mjs --yes`.
    `gen.mjs` without `--yes` stops at Flow's price prompt and approves nothing.
 
 ## 1. Generate

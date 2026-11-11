@@ -310,7 +310,31 @@ flags — Copilot and Perplexity stills, and INK/CEL versions of the cast.
 | `flow/templates.mjs` | prompt templates with the reason each exists |
 | `flow/octo.mjs` | mirrors the ledger (table `flow_gens`) and clips into the Octo workspace "Music video"; see SKILL.md §5 |
 
+**Pinned account (2026-11-11).** The Claude Chromium is signed in to several Google accounts and a
+plain `flow.google.com` URL lands on the browser's default one. The kit only ever uses the account
+in `FLOW_ACCOUNT` (default `needfsw02@gmail.com`, "Chaos"). `flowBase()` in `flow/lib.mjs` finds
+that account's index by loading `/u/0/` to `/u/4/` and reading the avatar's `Google Account: ...`
+label, and every navigation goes through `gotoFlow()` under `https://flow.google.com/u/<N>`; the
+email never goes in a URL. `ensureAccount()` re-reads the label after each navigation and before
+submitting or approving, and the script exits with an error on any other account. The ledger keeps
+project URLs without `/u/<N>` (the index can change). Projects belong to one account: a project
+the pinned account does not own answers "Project not found", and the kit then uses the pinned
+account's first listed project or creates one (`FLOW_PROJECT=new` forces a fresh one).
+`flowmusic.app` has a separate sign-in that no URL can select: `flow/music/send.mjs` refuses to
+send unless that site is signed in as the pinned account, and the read-only music scripts warn.
+
 **New UI facts learned while building it:**
+
+- 2026-11-11: the composer has two modes. With the `Agent` chip on, the agent states the price and
+  waits for Approve. With it off, `Start generation` spends at once with the settings shown (for
+  example x2 outputs, 48 credits) and no prompt. `openProject()` switches Agent mode on and
+  `submitPrompt()` refuses to submit unless it is on.
+- 2026-11-11: the agent now picks Omni 1.2 Flash and asks 24 credits for 8 s, 30 for 10 s, so
+  `gen.mjs --max-credits` defaults to 30.
+- 2026-11-11: in the asset picker, clicking a row previews it and shows `Add to prompt`; clicking
+  the row that is already previewed (a fresh upload is) attaches it at once and closes the picker,
+  so the button never appears. `attachImage()` handles both and checks that a chip
+  (`flow-ingredient-chip`) landed in the composer. `doctor.mjs` exercises both on an existing image.
 
 - Flow keeps hidden duplicates of many controls (`Upload media`, `Add to prompt`, `Approve`).
   Text and role lookups must filter to visible elements (`loc()` does this).
