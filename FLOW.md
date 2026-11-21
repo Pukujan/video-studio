@@ -17,8 +17,9 @@ The Approve step is manual-ish: after `flow-gen.js`, the agent asks
 `"Would you like me to kick off this 1 video generation, costing 20 credits?"`
 and you click `Approve` (a radio, not a button — see §5).
 
-Budget: **20 credits per clip, 50 credits/day** on this account. That is **2 clips
-per day**. Plan generations accordingly — never fire a batch expecting more.
+Budget: **20 credits per clip** (Veo 3.1 Fast), paid from the signed-in account's credit
+balance. There is no fixed clips-per-day limit: check the balance in the account menu
+(§7) and switch to another signed-in account when it runs low.
 
 ## 1. Session
 
@@ -34,8 +35,10 @@ curl -s --max-time 5 http://127.0.0.1:9222/json/version
 curl -s --max-time 5 http://127.0.0.1:9223/json/version
 ```
 
-- Account: PRO tier, banner reads "Your Google AI plan now comes with 50
-  additional Flow credits daily."
+- Accounts: several Google accounts can be signed in at once; Flow serves each under
+  `https://flow.google.com/u/<n>/` and the avatar menu has **Switch account**. On
+  2026-10-22 the PRO account's banner read "Your Google AI plan now comes with 50
+  additional Flow credits daily." That is a daily top-up, not the whole balance (§7).
 
 ## 2. Navigation
 
@@ -164,7 +167,13 @@ not a 8-bar one.
 ## 7. Cost model
 
 - **20 credits per generated clip.**
-- **50 credits/day** on PRO → **2 clips/day**, 10 credits left over.
+- **The limit is the balance, per account, not a daily clip count.** Open the avatar menu
+  (top right): it shows the balance and when it resets, e.g. "1,000 Google Flow credits ·
+  Resets Nov 30" on 2026-11-21 (a monthly allowance, about 50 clips). A PRO plan also adds
+  50 credits a day on top. Several family accounts each have their own balance.
+- Before a batch: read the balance, divide by 20, and spread the shots across accounts.
+- Corrected 2026-11-21: an earlier version of this runbook said "50 credits/day → 2 clips
+  per day". That read the daily top-up banner as the whole budget and was wrong.
 - Aspect ratio and variant count do not change the per-clip price shown.
 - There is no cheap "preview" tier in the agent flow. Budget by clip count.
 - The agent confirms the exact price in the permission prompt — read it rather
@@ -290,6 +299,6 @@ segment — envelope correlation 0.9008 at **58.839 s**. The full-song plan
 splices it in verbatim rather than re-cutting those 37 shots.
 
 **Budget reality.** The existing clip library covers every section, so the
-full cut costs **zero credits**. Flow is for *new* shots: at 20 credits and 50
-credits/day, that is **2 clips per day**. Prioritise the gaps the story bible
+full cut costs **zero credits**. Flow is for *new* shots, at 20 credits each from
+the signed-in account's balance (§7). Prioritise the gaps the story bible
 flags — Copilot and Perplexity stills, and INK/CEL versions of the cast.
